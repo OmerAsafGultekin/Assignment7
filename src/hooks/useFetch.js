@@ -32,6 +32,8 @@ export function useFetch(fetchFn, deps = []) {
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       })
       .catch((err) => {
+        // Ignore aborted requests caused by cleanup
+        if (err.name === 'AbortError') return;
         dispatch({ type: 'FETCH_FAILURE', payload: err.message });
       });
 
