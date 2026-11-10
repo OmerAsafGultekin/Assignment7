@@ -1,7 +1,40 @@
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import ProductList from './pages/ProductList';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
+import Login from './pages/Login';
+import NotFound from './pages/NotFound';
+
 export default function App() {
+  const [theme, setTheme] = useLocalStorage('app_theme', 'light');
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   return (
-    <div>
-      <h1>Assignment 7 - Online Shop</h1>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout theme={theme} toggleTheme={toggleTheme} />}>
+            <Route index element={<Home />} />
+            
+            {/* Nested routes under /products */}
+            <Route path="products" element={<Outlet />}>
+              <Route index element={<ProductList />} />
+              <Route path=":id" element={<ProductDetail />} />
+            </Route>
+
+            <Route path="cart" element={<Cart />} />
+            <Route path="login" element={<Login />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
