@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
@@ -23,13 +24,21 @@ export default function App() {
           <Route path="/" element={<Layout theme={theme} toggleTheme={toggleTheme} />}>
             <Route index element={<Home />} />
             
-            {/* Nested routes under /products */}
             <Route path="products" element={<Outlet />}>
               <Route index element={<ProductList />} />
               <Route path=":id" element={<ProductDetail />} />
             </Route>
 
-            <Route path="cart" element={<Cart />} />
+            {/* Protected Cart Route */}
+            <Route
+              path="cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+
             <Route path="login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Route>
