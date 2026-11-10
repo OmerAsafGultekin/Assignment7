@@ -10,26 +10,42 @@ export default function ProductList() {
   const query = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
 
-  // Derive unique categories from fetched products
   const categories = products
     ? Array.from(new Set(products.map((p) => p.category)))
     : [];
 
-  // Filter products directly during render
   const filteredProducts = (products || []).filter((product) => {
     const matchesQuery = product.title.toLowerCase().includes(query.toLowerCase());
     const matchesCategory = category ? product.category === category : true;
     return matchesQuery && matchesCategory;
   });
 
+  // Preserve existing query params when updating search
   const handleSearchChange = (e) => {
     const val = e.target.value;
-    setSearchParams(val ? { q: val } : {});
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (val) {
+        next.set('q', val);
+      } else {
+        next.delete('q');
+      }
+      return next;
+    });
   };
 
+  // Preserve existing query params when updating category
   const handleCategoryChange = (e) => {
     const val = e.target.value;
-    setSearchParams(val ? { category: val } : {});
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (val) {
+        next.set('category', val);
+      } else {
+        next.delete('category');
+      }
+      return next;
+    });
   };
 
   if (loading) return <p>Loading products...</p>;
@@ -39,7 +55,6 @@ export default function ProductList() {
     <div>
       <h2>Product Catalogue</h2>
       
-      {/* Filters bound to URL query params */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <input
           type="text"
